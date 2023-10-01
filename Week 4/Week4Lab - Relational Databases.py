@@ -102,6 +102,17 @@ def showColumns(tableName):
     conn.close()
     return columns
 
+# Search for customer orders
+def searchCustomerOrders(customerName):
+    # Create a connection to the database
+    conn = sqlite3.connect("customer_orders.db")
+    cursor = conn.cursor()
+
+    # Search for customer orders
+    query = cursor.execute(f"SELECT * FROM customer WHERE name LIKE '%{customerName}%'").fetchall()
+    print(query)
+    # Close the connection
+    conn.close()
 
 def main():
 # Create a connection to the database
