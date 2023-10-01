@@ -3,7 +3,7 @@
 
 # import sqlite3
 import sqlite3
-from contextlib import closing
+#from contextlib import closing
 
 
 # Deletes a table
@@ -80,11 +80,8 @@ def countRows(tableName):
     cursor = conn.cursor()
 
     # Count the number of rows in a table
-    query = f"SELECT COUNT(*) FROM {tableName}"
-    cursor.execute(query)
-
-    # Commit the changes
-    conn.commit()
+    query = cursor.execute(f"SELECT COUNT(*) FROM {tableName}").fetchone()[0]
+    print(query)
 
     # Close the connection
     conn.close()
@@ -109,7 +106,7 @@ def searchCustomerOrders(customerName):
     cursor = conn.cursor()
 
     # Search for customer orders
-    query = cursor.execute(f"SELECT * FROM customer WHERE name LIKE '%{customerName}%'").fetchall()
+    query = cursor.execute("SELECT * FROM orders o LEFT JOIN customer c ON c.id = o.customer_id WHERE c.name LIKE ?", ('%' + customerName + '%',)).fetchall()
     print(query)
     # Close the connection
     conn.close()
@@ -134,13 +131,24 @@ def main():
                     order_date TEXT,
                     priority TEXT,
                     FOREIGN KEY (customer_id) REFERENCES customer(id))""")
-    # Insert data into the customer table
     # Commit the changes
     conn.commit()
     # Close the connection
     conn.close()
+    
+    # Insert data into the customer table
     insertData("customer", (1, 'John Smith', 'hh@gmail.com', '1990-01-01', 'Ireland'))
+    # Add an order to the order table
+    insertData("orders", (1, 1, '2020-01-01', 'High'))
+    # Print the customer columns
     print(showColumns("customer"))
+    # Print the number of rows in the customer table
+    countRows("customer")
+    #Search an order for a customer
+    searchCustomerOrders("John")
+    # Clear the tables
+    clearTable("customer")
+    clearTable("orders")
 
 if __name__ == "__main__":
     main()
